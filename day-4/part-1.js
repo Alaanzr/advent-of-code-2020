@@ -17,10 +17,10 @@ const { read } = require('../utils')
   data.forEach(datum => {
     const formatted = datum.replace(/\n/g, ' ')
     const fields = formatted.split(' ')
+    console.log(fields)
 
     let fieldCount = 0
     fields.forEach(field => {
-      console.log('field', field)
       const [ key ] = field.split(':')
       if (requiredFields.includes(key)) {
         fieldCount += 1
