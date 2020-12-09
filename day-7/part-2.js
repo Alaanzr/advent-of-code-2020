@@ -1,3 +1,7 @@
+/**
+ * TODO: Fix - broke implementation at some point :<
+ */
+
 const { read } = require('../utils')
 
 ;(async () => {
@@ -13,46 +17,38 @@ const { read } = require('../utils')
       .trim())
 
     acc[key] = values
+      .map(i => i.split(/(\d)/).filter(i => i).map(i => i.trim()))
+      .map(group => {
+        const number = group[0] === 'no other' ? 0 : Number(group[0])
+        return { number, value: group[1] }
+      }) 
+
     return acc
   }, {})
 
-  console.log('colourset', colourSet)
+  const getBagSum = (list, colourSet, sum) => {
+    if (!list.length) return sum
 
-  // const containsBagRecursive = (myBag, bags, key, colourSet) => {
-  //   const list = Array.from(bags)
-  //   if (!list.length) return false
+    while (list.length) {
+      let group = list.shift()
 
-  //   const colour = list.shift()
+      if (!group.value) continue
+      sum += group.number * group.parentVal
 
-  //   if (colour === myBag) {
-  //     return true
-  //   }
+      for (let i = 0; i < colourSet[group.value].length; i++) {
+          list.push({ ...colourSet[group.value][i], parentVal: colourSet[group.value][i].number * (group.parentVal || 1), parent: `${group.parent} | ${group.value}` }) 
+      }
+    }
 
-  //   if (colourSet[colour] && colourSet[colour].length) {
-  //     list.push(...colourSet[colour])
-  //   }
-
-  //   const bagSet = new Set(list)
-    
-  //   return containsBagRecursive(myBag, bagSet, key, colourSet)
-  // }
-
-  const countBagsRecursive = (set, colourSets, sum) => {
-    const [num, colour] = set.split(/(\d)/).filter(i => i).map(i => i.trim())
+    return sum
   }
 
-  let sum = 0
+  let list = []
+  for (let i = 0; i < colourSet[myBag].length; i++) {
+    list.push({ ...colourSet[myBag][i], parentVal: 1 })
+  }
 
-  const startingSet = colourSets[myBag]
-
-  countBagsRecursive(startingSet, colourSets, sum)
-
-  // Object.keys(colourSet).forEach(key => {
-  //   const bags = new Set(colourSet[key])
-  //   if (containsBagRecursive(myBag, bags, key, colourSet)) {
-  //     sum += 1
-  //   }
-  // })
+  const sum = getBagSum(list, colourSet, 0)
 
   console.log(sum)
 })()
